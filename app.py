@@ -12,6 +12,7 @@ def home():
             Longitude: <input type="text" name="longitude"><br>
             Latitude: <input type="text" name="latitude"><br>
             Nombre de kilomètres: <input type="text" name="kilometre"><br>
+            Type requi (laissez vide pour tous les types): <input type="text" name="type"><br>
             <input type="submit" value="Rechercher">
         </form>
     '''
@@ -23,7 +24,8 @@ def search():
     longitude = float(request.form['longitude'])
     latitude = float(request.form['latitude'])
     kilometre = int(request.form['kilometre']) * 1000
-    results = get_places_nearby(latitude, longitude, kilometre)
+    type_requi = request.form.get('type', '').strip().lower()
+    results = get_places_nearby(latitude, longitude, kilometre, type_requi)
     os.makedirs("assets", exist_ok=True)
     last_file = file_numero()
     with open(f"assets/{last_file}", "w", encoding="utf-8") as f:
@@ -32,7 +34,7 @@ def search():
     output = "<h2>Résultats :</h2><ul>"
     for place in sorted(results, key=lambda x: (x.get("website") is not None, x.get("website") or ""), reverse=True):
         name = place.get("name", "Nom inconnu")
-        address = place.get("vicinity", "Adresse inconnue")
+        address = place.get("address", "Adresse inconnue")
         website = place.get("website")
         if website == None:
             website_display = "non"
